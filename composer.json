@@ -1,0 +1,23 @@
+{
+  "name": "themismin/laravel-mgo",
+  "keywords": [
+    "laravel"
+  ],
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "themismin",
+      "email": "ThemisMin@gmail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=5.6.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "ThemisMin\\LaravelMgo\\": "src/"
+    }
+  }
+}
