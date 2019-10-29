@@ -24,8 +24,8 @@ class CreateMgoColumnsTable extends Migration
             $table->integer('length')->nullable()->comment('列长度');
             $table->integer('decimals')->nullable()->comment('小数点长度');
             $table->boolean('not_null')->default(0)->comment('是否不为空');
-            $table->string('default')->default('')->comment('默认值');
-            $table->string('comment')->nullable()->comment('备注');
+            $table->string('default')->nullable()->comment('默认值');
+            $table->string('comment')->comment('备注');
 
             $table->boolean('auto_increment')->default(0)->comment('是否自增');
             $table->boolean('unsigned')->default(0)->comment('是否无符号');
