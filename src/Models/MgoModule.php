@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoModule whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoModule whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \ThemisMin\LaravelMgo\Models\MgoTable $mgoTable
  */
 class MgoModule extends Model
 {
@@ -42,4 +43,13 @@ class MgoModule extends Model
     {
         return $this->hasMany(MgoFeature::class, 'mgo_module_id', 'id');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function mgoTable()
+    {
+        return $this->belongsTo(MgoTable::class, 'mgo_table_name', 'name');
+    }
+
 }

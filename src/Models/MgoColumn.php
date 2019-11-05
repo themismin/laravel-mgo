@@ -50,6 +50,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoColumn whereUnsigned($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoColumn whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property string|null $enum_alias 枚举别名
+ * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoColumn whereEnumAlias($value)
  */
 class MgoColumn extends Model
 {

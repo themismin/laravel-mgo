@@ -38,6 +38,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoTable whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoTable whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\ThemisMin\LaravelMgo\Models\MgoModule[] $mgoModule
+ * @property-read int|null $mgo_module_count
  */
 class MgoTable extends Model
 {
@@ -86,6 +88,14 @@ class MgoTable extends Model
     public function mgoOrderBys()
     {
         return $this->hasMany(MgoOrderBy::class, 'mgo_table_name', 'name');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function mgoModule()
+    {
+        return $this->hasMany(MgoModule::class, 'mgo_table_name', 'name');
     }
 
     /**
