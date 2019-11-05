@@ -43,11 +43,4 @@ class MgoEnum extends Model
         return $this->hasMany(MgoEnumValue::class, 'mgo_enum_alias', 'alias');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function mgoTables()
-    {
-        return $this->hasMany(MgoTable::class, 'mgo_enum_alias', 'alias');
-    }
 }

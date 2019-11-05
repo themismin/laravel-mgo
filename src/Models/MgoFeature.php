@@ -37,6 +37,15 @@ class MgoFeature extends Model
     protected $guarded = ['id'];
 
     /**
+     * 这个属性应该被转换为原生类型.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'attr' => 'array',
+    ];
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function mgoModule()
