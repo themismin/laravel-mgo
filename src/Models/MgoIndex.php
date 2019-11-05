@@ -34,13 +34,11 @@ use Illuminate\Database\Eloquent\Model;
 class MgoIndex extends Model
 {
     /**
-     * The attributes that are mass assignable.
+     * The attributes that aren't mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
-        'mgo_table_name', 'name', 'fields', 'type', 'method', 'comment'
-    ];
+    protected $guarded = ['id'];
 
 
     /**

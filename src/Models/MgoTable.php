@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection|\ThemisMin\LaravelMgo\Models\MgoColumn[] $mgoColumns
  * @property-read int|null $mgo_columns_count
+ * @property-read \ThemisMin\LaravelMgo\Models\MgoEnum $mgoEnum
  * @property-read \Illuminate\Database\Eloquent\Collection|\ThemisMin\LaravelMgo\Models\MgoForeign[] $mgoForeigns
  * @property-read int|null $mgo_foreigns_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\ThemisMin\LaravelMgo\Models\MgoIndex[] $mgoIndices
@@ -41,13 +42,11 @@ use Illuminate\Database\Eloquent\Model;
 class MgoTable extends Model
 {
     /**
-     * The attributes that are mass assignable.
+     * The attributes that aren't mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
-        'name', 'display_name', 'model_class', 'comment', 'migrate'
-    ];
+    protected $guarded = ['id'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -87,6 +86,14 @@ class MgoTable extends Model
     public function mgoOrderBys()
     {
         return $this->hasMany(MgoOrderBy::class, 'mgo_table_name', 'name');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function mgoEnum()
+    {
+        return $this->belongsTo(MgoEnum::class, 'mgo_enum_alias', 'alias');
     }
 
 }

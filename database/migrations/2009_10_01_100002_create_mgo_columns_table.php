@@ -30,7 +30,8 @@ class CreateMgoColumnsTable extends Migration
             $table->boolean('auto_increment')->default(0)->comment('是否自增');
             $table->boolean('unsigned')->default(0)->comment('是否无符号');
 
-            $table->string('data_type')->default('text')->comment('数据类型(text:文本,rich_text:富文本,image:图片,audio:音频,video:视频,has_one:对一关联,has_many:对多关联)');
+            $table->string('data_type')->default('text')->comment('数据类型(enum:枚举,number:数字,text:文本,rich_text:富文本,image:图片,audio:音频,video:视频,has_one:对一关联,has_many:对多关联)');
+            $table->string('enum_alias')->nullable()->comment('枚举别名');
             $table->boolean('display_key')->default(0)->comment('是否展示键');
             $table->bigInteger('order_by')->default(0)->comment('排序');
 

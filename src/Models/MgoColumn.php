@@ -54,13 +54,11 @@ use Illuminate\Database\Eloquent\Model;
 class MgoColumn extends Model
 {
     /**
-     * The attributes that are mass assignable.
+     * The attributes that aren't mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
-        'mgo_table_name', 'name', 'display_name', 'type', 'length', 'decimals', 'not_null', 'default', 'comment', 'auto_increment', 'unsigned', 'display_key', 'order_by'
-    ];
+    protected $guarded = ['id'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

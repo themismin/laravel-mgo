@@ -32,13 +32,11 @@ use Illuminate\Database\Eloquent\Model;
 class MgoOrderBy extends Model
 {
     /**
-     * The attributes that are mass assignable.
+     * The attributes that aren't mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
-        'mgo_table_name', 'field', 'field_id', 'direction', 'order_by'
-    ];
+    protected $guarded = ['id'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

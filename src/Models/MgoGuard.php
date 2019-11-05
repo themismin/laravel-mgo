@@ -25,11 +25,9 @@ use Illuminate\Database\Eloquent\Model;
 class MgoGuard extends Model
 {
     /**
-     * The attributes that are mass assignable.
+     * The attributes that aren't mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
-        'display_name', 'name'
-    ];
+    protected $guarded = ['id'];
 }

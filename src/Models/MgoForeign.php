@@ -43,13 +43,11 @@ use Illuminate\Database\Eloquent\Model;
 class MgoForeign extends Model
 {
     /**
-     * The attributes that are mass assignable.
+     * The attributes that aren't mass assignable.
      *
      * @var array
      */
-    protected $fillable = [
-        'mgo_table_name', 'name', 'field', 'field_id', 'referenced_table_name', 'referenced_field', 'referenced_field_id', 'on_delete', 'on_update'
-    ];
+    protected $guarded = ['id'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

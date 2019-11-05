@@ -20,11 +20,11 @@ class CreateMgoForeignsTable extends Migration
 
             $table->string('name')->comment('外键名称');
 
-            $table->string('field')->comment('外键字段(关联定义列属性)(定义列属性列名称)');
+            // $table->string('field')->comment('外键字段(关联定义列属性)(定义列属性列名称)');
             $table->bigInteger('field_id')->unsigned()->comment('外键字段ID(关联定义列属性)(定义列属性列ID)');
 
             $table->string('referenced_table_name')->comment('外键关联表(关联定义表属性)(定义表属性表名称)');
-            $table->string('referenced_field')->comment('外键关联字段(关联定义列属性)(定义列属性列名称)');
+            // $table->string('referenced_field')->comment('外键关联字段(关联定义列属性)(定义列属性列名称)');
             $table->bigInteger('referenced_field_id')->unsigned()->comment('外键关联字段ID(关联定义列属性)(定义列属性列ID)');
 
             $table->string('on_update')->default('CASCADE')->comment('更新约束(CASCADE,SET NULL,RESTRICT,NO ACTION)');
