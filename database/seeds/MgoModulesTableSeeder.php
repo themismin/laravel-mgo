@@ -14,7 +14,7 @@ class MgoModulesTableSeeder extends Seeder
     {
         DB::table('mgo_modules')->truncate();
         $mgoModules = [
-            ['name' => '定义表属性管理', 'mgo_table_name' => 'mgo_tables', 'default_type' => 'list', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['mgo_page_id' => '1', 'name' => '列表', 'mgo_table_name' => 'mgo_tables', 'type' => 'list', 'attr' => '{"columns":[{"column":"name"},{"column":"display_name"},{"column":"model_class"},{"column":"comment"},{"column":"migrate"}],"order_by":[{"column":"created_at","sort":"ASC"}],"search":[{"column":"name"}]}', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
         ];
         DB::table('mgo_modules')->insert($mgoModules);
     }

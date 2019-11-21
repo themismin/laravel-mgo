@@ -15,11 +15,14 @@ class CreateMgoFeaturesTable extends Migration
     {
         Schema::create('mgo_features', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('mgo_module_id')->comment('模块ID');
+            $table->bigInteger('mgo_module_id')->unsigned()->comment('关联定义模块(模块ID)');
+            // $table->string('display_name')->comment('显示名称');
             $table->string('name')->comment('功能名称');
-            $table->string('type')->comment('功能类型(index,list,tree,charts,add,delete,update,view,share,...)');
-            $table->text('attr')->nullable()->comment('功能属性(list:{column:[title,logo,...],order_by:[created_at,updated_at],search:[title,deleted_at,...]},add:{...},update:[{column:name,edit:false},{column:logo,edit:true}])');
+            $table->string('type')->comment('功能类型(add,delete,update,view,share,...)');
+            $table->text('attr')->nullable()->comment('功能属性(add:{...},update:[{column:name,edit:false},{column:logo,edit:true}])');
             $table->timestamps();
+
+            $table->foreign('mgo_module_id')->references('id')->on('mgo_modules')->onUpdate('CASCADE')->onDelete('RESTRICT');
         });
         DB::statement("ALTER TABLE `mgo_features` comment '定义功能'");
     }

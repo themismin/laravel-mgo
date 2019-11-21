@@ -16,7 +16,7 @@ class CreateMgoTablesTable extends Migration
         Schema::create('mgo_tables', function (Blueprint $table) {
             $table->bigIncrements('id');
 
-            $table->string('name')->comment('表名称');
+            $table->string('name')->comment('表名');
             $table->string('display_name')->comment('显示名称');
             $table->string('model_class')->comment('模型类名');
             $table->string('comment')->nullable()->comment('备注');

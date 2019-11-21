@@ -16,7 +16,7 @@ class CreateMgoIndicesTable extends Migration
         Schema::create('mgo_indices', function (Blueprint $table) {
             $table->bigIncrements('id');
 
-            $table->string('mgo_table_name')->comment('关联定义表属性(定义表属性表名称)');
+            $table->string('mgo_table_name')->comment('关联定义表属性(表名)');
 
             $table->string('name')->comment('索引名称');
             $table->string('fields')->comment('索引字段(["name"])');

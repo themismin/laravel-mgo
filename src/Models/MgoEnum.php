@@ -4,23 +4,22 @@ namespace ThemisMin\LaravelMgo\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+
 /**
  * ThemisMin\LaravelMgo\Models\MgoEnum
  *
  * @property int $id
  * @property string $name 枚举名称
- * @property string $alias 枚举别名
+ * @property string $display_name 显示名称
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\ThemisMin\LaravelMgo\Models\MgoColumn[] $mgoColumns
  * @property-read \Illuminate\Database\Eloquent\Collection|\ThemisMin\LaravelMgo\Models\MgoEnumValue[] $mgoEnumValues
- * @property-read int|null $mgo_enum_values_count
- * @property-read \Illuminate\Database\Eloquent\Collection|\ThemisMin\LaravelMgo\Models\MgoTable[] $mgoTables
- * @property-read int|null $mgo_tables_count
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoEnum newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoEnum newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoEnum query()
- * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoEnum whereAlias($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoEnum whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoEnum whereDisplayName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoEnum whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoEnum whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoEnum whereUpdatedAt($value)
@@ -28,6 +27,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class MgoEnum extends Model
 {
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'mgo_enums';
+
     /**
      * The attributes that aren't mass assignable.
      *
@@ -40,7 +47,14 @@ class MgoEnum extends Model
      */
     public function mgoEnumValues()
     {
-        return $this->hasMany(MgoEnumValue::class, 'mgo_enum_alias', 'alias');
+        return $this->hasMany(MgoEnumValue::class, 'mgo_enum_name', 'name');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function mgoColumns()
+    {
+        return $this->hasMany(MgoColumn::class, 'mgo_enum_name', 'name');
+    }
 }

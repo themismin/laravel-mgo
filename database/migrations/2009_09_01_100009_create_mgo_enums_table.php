@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class CreateMgoGuardsTable extends Migration
+class CreateMgoEnumsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,15 @@ class CreateMgoGuardsTable extends Migration
      */
     public function up()
     {
-        Schema::create('mgo_guards', function (Blueprint $table) {
+        Schema::create('mgo_enums', function (Blueprint $table) {
             $table->bigIncrements('id');
-
+            $table->string('name')->comment('枚举名称');
             $table->string('display_name')->comment('显示名称');
-            $table->string('name')->comment('守卫名称');
-
             $table->timestamps();
 
             $table->unique(['name']);
         });
-
-        DB::statement("ALTER TABLE `mgo_guards` comment '定义守卫属性'");
-
+        DB::statement("ALTER TABLE `mgo_enums` comment '定义枚举'");
     }
 
     /**
@@ -35,6 +31,6 @@ class CreateMgoGuardsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('mgo_guards');
+        Schema::dropIfExists('mgo_enums');
     }
 }

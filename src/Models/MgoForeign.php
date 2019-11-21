@@ -8,15 +8,13 @@ use Illuminate\Database\Eloquent\Model;
  * ThemisMin\LaravelMgo\Models\MgoForeign
  *
  * @property int $id
- * @property string $mgo_table_name 定义表属性名称(关联表名称)
+ * @property string $mgo_table_name 关联定义表属性(表名)
  * @property string $name 外键名称
- * @property string $field 外键字段("mgo_table_name")(定义列属性名称)(关联列名称)
- * @property int $field_id 外键字段ID(关联列ID)
- * @property string $referenced_table_name 外键关联表("mgo_tables")
- * @property string $referenced_field 外键关联字段("name")
- * @property int $referenced_field_id 外键关联字段ID(关联列ID)
- * @property string $on_update 更新约束("CASCADE")
- * @property string $on_delete 删除约束("RESTRICT")
+ * @property int $mgo_column_id 外键字段ID(关联定义列属性)(列ID)
+ * @property string $referenced_mgo_table_name 外键关联表(关联定义表属性)(表名)
+ * @property int $referenced_mgo_column_id 外键关联字段ID(关联定义列属性)(列ID)
+ * @property string $on_update 更新约束(CASCADE,SET NULL,RESTRICT,NO ACTION)
+ * @property string $on_delete 删除约束(CASCADE,SET NULL,RESTRICT,NO ACTION)
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \ThemisMin\LaravelMgo\Models\MgoColumn $mgoColumn
@@ -27,21 +25,27 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign query()
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereField($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereFieldId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereMgoColumnId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereMgoTableName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereOnDelete($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereOnUpdate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereReferencedField($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereReferencedFieldId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereReferencedTableName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereReferencedMgoColumnId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereReferencedMgoTableName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoForeign whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class MgoForeign extends Model
 {
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'mgo_foreigns';
+
     /**
      * The attributes that aren't mass assignable.
      *
@@ -50,6 +54,7 @@ class MgoForeign extends Model
     protected $guarded = ['id'];
 
     /**
+     * 多对一(获取定义外键属性所属定义表属性)(外键)
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function mgoTable()
@@ -58,28 +63,31 @@ class MgoForeign extends Model
     }
 
     /**
+     * 多对一(获取定义外键属性所属定义列属性)(外键)
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function mgoColumn()
     {
-        return $this->belongsTo(MgoColumn::class, 'field_id', 'id');
+        return $this->belongsTo(MgoColumn::class, 'mgo_column_id', 'id');
 
     }
 
     /**
+     * 多对一(获取定义外键属性所属定义表属性)(反向外键)
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function referencedMgoTable()
     {
-        return $this->belongsTo(MgoTable::class, 'referenced_table_name', 'name');
+        return $this->belongsTo(MgoTable::class, 'referenced_mgo_table_name', 'name');
     }
 
     /**
+     * 多对一(获取定义外键属性所属定义列属性)(反向外键)
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function referencedMgoColumn()
     {
-        return $this->belongsTo(MgoColumn::class, 'referenced_field_id', 'id');
+        return $this->belongsTo(MgoColumn::class, 'referenced_mgo_column_id', 'id');
 
     }
 }

@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Model;
  * ThemisMin\LaravelMgo\Models\MgoIndex
  *
  * @property int $id
- * @property string $mgo_table_name 定义表属性名称(关联表名称)
+ * @property string $mgo_table_name 关联定义表属性(表名)
  * @property string $name 索引名称
  * @property string $fields 索引字段(["name"])
  * @property string $type 索引类型("PRIMARY", "UNIQUE")
- * @property string $method 索引算法("BTREE", "HASH")
+ * @property string $method 索引算法(BTREE, HASH)
  * @property string $comment 备注
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -33,6 +33,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class MgoIndex extends Model
 {
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'mgo_indices';
+
     /**
      * The attributes that aren't mass assignable.
      *
@@ -40,8 +48,8 @@ class MgoIndex extends Model
      */
     protected $guarded = ['id'];
 
-
     /**
+     * 多对一(获取定义索引属性所属定义表属性)
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function mgoTable()

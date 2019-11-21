@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
  * ThemisMin\LaravelMgo\Models\MgoColumn
  *
  * @property int $id
- * @property string $mgo_table_name 关联定义表属性(定义表属性表名称)
+ * @property string $mgo_table_name 关联定义表属性(表名)
  * @property string $name 列名称
  * @property string $display_name 显示名称
  * @property string $type 列类型
@@ -20,18 +20,16 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $auto_increment 是否自增
  * @property int $unsigned 是否无符号
  * @property string $data_type 数据类型(enum:枚举,number:数字,text:文本,rich_text:富文本,image:图片,audio:音频,video:视频,has_one:对一关联,has_many:对多关联)
- * @property string|null $mgo_enum_alias 枚举别名
+ * @property string|null $mgo_enum_name 关联定义枚举(枚举名称)
  * @property int $display_key 是否展示键
  * @property int $order_by 排序
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \ThemisMin\LaravelMgo\Models\MgoEnum|null $mgoEnum
  * @property-read \Illuminate\Database\Eloquent\Collection|\ThemisMin\LaravelMgo\Models\MgoEnumValue[] $mgoEnumValues
- * @property-read int|null $mgo_enum_values_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\ThemisMin\LaravelMgo\Models\MgoForeign[] $mgoForeigns
- * @property-read int|null $mgo_foreigns_count
  * @property-read \ThemisMin\LaravelMgo\Models\MgoTable $mgoTable
  * @property-read \Illuminate\Database\Eloquent\Collection|\ThemisMin\LaravelMgo\Models\MgoForeign[] $referencedMgoForeigns
- * @property-read int|null $referenced_mgo_foreigns_count
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoColumn newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoColumn newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoColumn query()
@@ -45,7 +43,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoColumn whereDisplayName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoColumn whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoColumn whereLength($value)
- * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoColumn whereMgoEnumAlias($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoColumn whereMgoEnumName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoColumn whereMgoTableName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoColumn whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\ThemisMin\LaravelMgo\Models\MgoColumn whereNotNull($value)
@@ -57,6 +55,14 @@ use Illuminate\Database\Eloquent\Model;
  */
 class MgoColumn extends Model
 {
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'mgo_columns';
+
     /**
      * The attributes that aren't mass assignable.
      *
@@ -65,6 +71,7 @@ class MgoColumn extends Model
     protected $guarded = ['id'];
 
     /**
+     * 多对一(获取定义列属性所属定义表属性)
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function mgoTable()
@@ -73,28 +80,39 @@ class MgoColumn extends Model
     }
 
     /**
-     * 外键字段
+     * 一对多(获取定义列属性的定义外键属性)(外键)
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function mgoForeigns()
     {
-        return $this->hasMany(MgoForeign::class, 'field_id', 'id');
+        return $this->hasMany(MgoForeign::class, 'mgo_column_id', 'id');
     }
 
     /**
-     * 反向外键字段
+     * 一对多(获取定义列属性的定义外键属性)(反向外键)
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function referencedMgoForeigns()
     {
-        return $this->hasMany(MgoForeign::class, 'referenced_field_id', 'id');
+        return $this->hasMany(MgoForeign::class, 'referenced_mgo_column_id', 'id');
     }
 
     /**
+     * 多对一(获取定义列属性所属定义枚举)
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function mgoEnum()
+    {
+        return $this->belongsTo(MgoEnum::class, 'mgo_enum_name', 'name');
+    }
+
+    /**
+     * 一对多(获取定义列属性的定义枚举值)
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function mgoEnumValues()
     {
-        return $this->hasMany(MgoEnumValue::class, 'mgo_enum_alias', 'mgo_enum_alias');
+        return $this->hasMany(MgoEnumValue::class, 'mgo_enum_name', 'mgo_enum_name');
     }
+
 }

@@ -16,7 +16,7 @@ class CreateMgoColumnsTable extends Migration
         Schema::create('mgo_columns', function (Blueprint $table) {
             $table->bigIncrements('id');
 
-            $table->string('mgo_table_name')->comment('关联定义表属性(定义表属性表名称)');
+            $table->string('mgo_table_name')->comment('关联定义表属性(表名)');
 
             $table->string('name')->comment('列名称');
             $table->string('display_name')->comment('显示名称');
@@ -31,14 +31,16 @@ class CreateMgoColumnsTable extends Migration
             $table->boolean('unsigned')->default(0)->comment('是否无符号');
 
             $table->string('data_type')->default('text')->comment('数据类型(enum:枚举,number:数字,text:文本,rich_text:富文本,image:图片,audio:音频,video:视频,has_one:对一关联,has_many:对多关联)');
-            $table->string('mgo_enum_alias')->nullable()->comment('枚举别名');
+            $table->string('mgo_enum_name')->nullable()->comment('关联定义枚举(枚举名称)');
             $table->boolean('display_key')->default(0)->comment('是否展示键');
             $table->bigInteger('order_by')->default(0)->comment('排序');
 
             $table->timestamps();
 
             $table->unique(['mgo_table_name', 'name']);
+
             $table->foreign('mgo_table_name')->references('name')->on('mgo_tables')->onUpdate('CASCADE')->onDelete('RESTRICT');
+            $table->foreign('mgo_enum_name')->references('name')->on('mgo_enums')->onUpdate('CASCADE')->onDelete('RESTRICT');
         });
 
         DB::statement("ALTER TABLE `mgo_columns` comment '定义列属性'");
