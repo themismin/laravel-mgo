@@ -34,4 +34,14 @@ return [
         'mgo_pages' => \ThemisMin\LaravelMgo\Models\MgoPage::class,
 
     ],
+
+    // 模型路径
+    'model_path' => env('MGO_MODEL_PATH', ''),
+
+    // 模型命名空间
+    'model_namespace' => env('MGO_MODEL_NAMESPACE', ''),
+
+    // 迁移文件路径
+    'migrate_path' => env('MGO_MIGRATE_PATH', database_path('migrations')),
+
 ];

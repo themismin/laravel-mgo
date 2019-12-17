@@ -15,6 +15,7 @@ class MgoPagesTableSeeder extends Seeder
         DB::table('mgo_pages')->truncate();
         $mgoPages = [
             ['mgo_guard_id' => '1', 'name' => '定义表属性管理', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['mgo_guard_id' => '1', 'name' => '定义列属性管理', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
         ];
         DB::table('mgo_pages')->insert($mgoPages);
     }

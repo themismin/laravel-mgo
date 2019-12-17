@@ -80,12 +80,12 @@ class MgoColumn extends Model
     }
 
     /**
-     * 一对多(获取定义列属性的定义外键属性)(外键)
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * 一对一(获取定义列属性的定义外键属性)(外键)
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function mgoForeigns()
+    public function mgoForeign()
     {
-        return $this->hasMany(MgoForeign::class, 'mgo_column_id', 'id');
+        return $this->hasOne(MgoForeign::class, 'mgo_column_id', 'id');
     }
 
     /**

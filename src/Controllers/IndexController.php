@@ -2,10 +2,12 @@
 
 namespace ThemisMin\LaravelMgo\Controllers;
 
-use Illuminate\Routing\Controller;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use ThemisMin\LaravelMgo\Models\MgoColumn;
 use ThemisMin\LaravelMgo\Models\MgoFeature;
@@ -53,6 +55,7 @@ class IndexController extends Controller
                     $mgoModuleConfig[] = [
                         "id" => $mgoModule->id,
                         "name" => $mgoModule->name,
+                        'mgo_table_name' => $mgoModule->mgo_table_name,
                         "type" => $mgoModule->type,
                         "search" => $this->searchColumns($mgoModule, $searchColumns),
                         "columns" => $this->listColumns($mgoModule, $listColumns),
@@ -80,8 +83,12 @@ class IndexController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function listModule(MgoModule $mgoModule, Request $request)
+    public function listModule(MgoModule $mgoModule, Request $request)
     {
+        if ('list' != $mgoModule->type) {
+            return response_json(null, 500);
+        }
+
         /** @var MgoTable|Collection $mgoTable 定义表 */
         $mgoTable = $mgoModule->mgoTable;
         /** @var MgoColumn[]|Collection $mgoColumns 定义列 */
@@ -102,6 +109,7 @@ class IndexController extends Controller
         } else {
             $searchMgoColumns = collect([]);
         }
+
         $credentials = $request->all();
         foreach ($searchMgoColumns as $searchMgoColumn) {
             if (isset($credentials['search_' . $searchMgoColumn->name])) {
@@ -119,6 +127,7 @@ class IndexController extends Controller
         /** @var MgoColumn[]|array $listMgoColumns 列表显示字段 */
         if ($attrColumns) {
             $columns = collect($attrColumns)->pluck(['column'])->toArray();
+            in_array('id', $columns) ?: $columns = array_merge(['id'], $columns);
             $listMgoColumns = $mgoColumns->whereIn('name', $columns);
         } else {
             $listMgoColumns = $mgoColumns;
@@ -148,8 +157,12 @@ class IndexController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function showFeature(MgoFeature $mgoFeature, Request $request)
+    public function showFeature(MgoFeature $mgoFeature, Request $request)
     {
+        if ('show' != $mgoFeature->type) {
+            return response_json(null, 500);
+        }
+
         /** @var MgoModule|Collection $mgoModule */
         $mgoModule = $mgoFeature->mgoModule;
         /** @var MgoTable|Collection $mgoTable 定义表 */
@@ -204,8 +217,12 @@ class IndexController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function editFeature(MgoFeature $mgoFeature, Request $request)
+    public function editFeature(MgoFeature $mgoFeature, Request $request)
     {
+        if ('edit' != $mgoFeature->type) {
+            return response_json(null, 500);
+        }
+
         /** @var MgoModule|Collection $mgoModule */
         $mgoModule = $mgoFeature->mgoModule;
         /** @var MgoTable|Collection $mgoTable 定义表 */
@@ -247,21 +264,22 @@ class IndexController extends Controller
 
         $editDate = [];
         foreach ($editMgoColumns as $editMgoColumn) {
+            $editColumn = [
+                'title' => $editMgoColumn->display_name,
+                'key' => $editMgoColumn->name,
+                'data_type' => $editMgoColumn->data_type,
+                'data_values' => $this->dataValues($editMgoColumn),
+                'data' => $data->{$editMgoColumn->name},
+            ];
             $rules = [];
             if (1 == $editMgoColumn->not_null) {
                 $rules[] = [
                     'rule' => 'required'
                 ];
             }
-
-            $editDate[] = [
-                "title" => $editMgoColumn->display_name,
-                "key" => $editMgoColumn->name,
-                'data_type' => $editMgoColumn->data_type,
-                'rules' => $rules,
-                'style' => isset($keyByAttrColumns[$editMgoColumn->name]['style']) ? $keyByAttrColumns[$editMgoColumn->name]['style'] : [],
-                'data' => $data->{$editMgoColumn->name},
-            ];
+            $editColumn['rules'] = $rules;
+            $editColumn['style'] = isset($keyByAttrColumns[$editMgoColumn->name]['style']) ? $keyByAttrColumns[$editMgoColumn->name]['style'] : [];
+            $editDate[] = $editColumn;
         }
 
         return response_json($editDate);
@@ -275,6 +293,10 @@ class IndexController extends Controller
      */
     public function updateFeature(MgoFeature $mgoFeature, Request $request)
     {
+        if ('edit' != $mgoFeature->type) {
+            return response_json(null, 500);
+        }
+
         /** @var MgoModule|Collection $mgoModule */
         $mgoModule = $mgoFeature->mgoModule;
         /** @var MgoTable|Collection $mgoTable 定义表 */
@@ -337,6 +359,10 @@ class IndexController extends Controller
      */
     public function destroyFeature(MgoFeature $mgoFeature, Request $request)
     {
+        if ('destroy' != $mgoFeature->type) {
+            return response_json(null, 500);
+        }
+
         /** @var MgoModule|Collection $mgoModule */
         $mgoModule = $mgoFeature->mgoModule;
         /** @var MgoTable|Collection $mgoTable 定义表 */
@@ -369,8 +395,12 @@ class IndexController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function createFeature(MgoFeature $mgoFeature, Request $request)
+    public function createFeature(MgoFeature $mgoFeature, Request $request)
     {
+        if ('create' != $mgoFeature->type) {
+            return response_json(null, 500);
+        }
+
         /** @var MgoModule|Collection $mgoModule */
         $mgoModule = $mgoFeature->mgoModule;
         /** @var MgoTable|Collection $mgoTable 定义表 */
@@ -398,12 +428,8 @@ class IndexController extends Controller
                 'title' => $createMgoColumn->display_name,
                 'key' => $createMgoColumn->name,
                 'data_type' => $createMgoColumn->data_type,
+                'data_values' => $this->dataValues($createMgoColumn),
             ];
-            switch ($createMgoColumn->data_type) {
-                case 'enum':
-                    $createColumn['mgo_enum_values'] = $createMgoColumn->mgoEnumValues->only(['id', 'name', 'display_name']);
-                    break;
-            }
             $rules = [];
             if (1 == $createMgoColumn->not_null) {
                 $rules[] = [
@@ -426,6 +452,10 @@ class IndexController extends Controller
      */
     public function storeFeature(MgoFeature $mgoFeature, Request $request)
     {
+        if ('create' != $mgoFeature->type) {
+            return response_json(null, 500);
+        }
+
         /** @var MgoModule|Collection $mgoModule */
         $mgoModule = $mgoFeature->mgoModule;
         /** @var MgoTable|Collection $mgoTable 定义表 */
@@ -469,6 +499,184 @@ class IndexController extends Controller
 
         $storeData = $tableModel->create($credentials);
         return response_json($storeData);
+    }
+
+    /**
+     * 定义功能-恢复
+     * @param MgoFeature $mgoFeature
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function restoreFeature(MgoFeature $mgoFeature, Request $request)
+    {
+        if ('restore' != $mgoFeature->type) {
+            return response_json(null, 500);
+        }
+
+        /** @var MgoModule|Collection $mgoModule */
+        $mgoModule = $mgoFeature->mgoModule;
+        /** @var MgoTable|Collection $mgoTable 定义表 */
+        $mgoTable = $mgoModule->mgoTable;
+        /** @var MgoColumn[]|Collection $mgoColumns 定义列 */
+        $mgoColumns = $mgoTable->mgoColumns;
+
+        /** @var Model $tableModel 模块功能 表模型 */
+        $tableModel = app($mgoTable->model_class);
+        /** @var string $tableName 表名 */
+        $tableName = $mgoTable->name;
+
+        $credentials = $request->all();
+        $validator = Validator::make($credentials, [
+            'id' => "required|exists:{$tableName}",
+        ]);
+        if ($validator->fails()) {
+            return response_json($validator->errors(), '422');
+        }
+
+        // TODO::外键关联判断是否可以恢复
+        $restoreData = $tableModel->restore($credentials['id']);
+
+        return response_json($restoreData);
+    }
+
+    /**
+     * 定义功能-下拉
+     * @param MgoTable $mgoTable
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function dropDown(MgoTable $mgoTable, Request $request)
+    {
+        /** @var Model $tableModel 模块功能 表模型 */
+        $tableModel = app($mgoTable->model_class);
+
+        $credentials = $request->all();
+        $validator = Validator::make($credentials, [
+            'id' => [
+                'required',
+                Rule::exists('mgo_columns')->where(function ($query) use ($mgoTable) {
+                    $query->where('mgo_table_name', $mgoTable->name);
+                }),
+            ],
+        ]);
+        if ($validator->fails()) {
+            return response_json($validator->errors(), '422');
+        }
+        $titleMgoColumn = $mgoTable->mgoColumns()->where('display_key', 1)->first();
+        $keyMgoColumn = $mgoTable->mgoColumns()->where('id', $credentials['id'])->first();
+
+        return $tableModel->select(\DB::raw("{$titleMgoColumn->name} AS `title`, {$keyMgoColumn->name} AS `key`"))->customPaginate();
+    }
+
+    /**
+     * 定义功能-生成迁移文件和模型
+     */
+    public function migrationFilesFeature(MgoFeature $mgoFeature, Request $request)
+    {
+        $blank = " ";
+        $dt = Carbon::now();
+        $id = $request->get('id');
+        //读取表以及表中的列
+        $model_path = base_path('app/Repository/Entities');
+        $table = MgoTable::with('mgoColumns')->where('id', $id)->first();
+        $mod_name = Str::singular(Str::studly($table->name));
+        // substr(str_replace(' ', '', ucwords(str_replace('_', ' ', $table->name))), 0, -1);
+        if (file_exists($model_path . '/' . $mod_name . '.php') == false) {
+            $mod_str = '<?php' . PHP_EOL . 'use Illuminate\Database\Eloquent\Model;' . PHP_EOL . 'class' .
+                $blank . $mod_name . $blank . 'extends' . $blank . 'Model' . PHP_EOL . '{' . PHP_EOL;
+            $mod_str .= 'protected $guarded = [\'id\'];' . PHP_EOL . '}';
+            $model_url = fopen($model_path . '/' . $mod_name . '.php', 'w');
+            //生成model
+            fwrite($model_url, $mod_str);
+            $tableName = $dt->year . '_' . $dt->month . '_' . $dt->day . '_' . $dt->hour . $dt->minute . $dt->second . '_' . $table->name;
+            $database_path = database_path('migrations');
+            $files_url = fopen($database_path . '/' . $tableName . '.php', 'w');
+            $use = 'use Illuminate\Support\Facades\Schema; ' . PHP_EOL . 'use Illuminate\Database\Schema\Blueprint;' . PHP_EOL . 'use Illuminate\Database\Migrations\Migration;' . PHP_EOL;
+            $str = '<?php' . PHP_EOL . PHP_EOL . $use . PHP_EOL . PHP_EOL;
+
+            // dd($table);
+            $str .= 'class ' . $table->name . $blank . 'extends' . $blank . 'Migration' . PHP_EOL . '{' . PHP_EOL . PHP_EOL . 'public function up()' . PHP_EOL . '{';
+            $str .= PHP_EOL . 'Schema::create(' . "'" . $table->name . "'" . ',' . 'function(Blueprint $table) {' . PHP_EOL;
+
+            // fwrite($files_url, $str);
+            // dd(333);
+            $guarded = ['id'];
+            $timeArray = ['created_at', 'updated_at'];
+            foreach ($table->mgoColumns as $k => $v) {
+                // dump($table->name, $v['id'], $v);
+                if (!in_array($v['name'], $timeArray)) {
+                    // dump($v->name, $v['type'], $v['name']);
+                    $name = $v->name;
+                    $length = $v->length;
+                    if ($v['name'] = 'id' && $v['auto_increment'] == 1) {
+                        $str .= '$table->bigIncrements(' . "'" . $name . "'" . ')';
+                    }
+                    if ($v['name'] != 'id' && $v['type'] == 'bigint') {
+                        $str .= '$table->increments(' . "'" . $name . "'" . ')';
+                    }
+                    if ($v['type'] == 'varchar') {
+                        $str .= '$table->string(' . "'" . $name . "'";
+                        if ($length != null) {
+                            $str .= ',' . $length . ')';
+                        } else {
+                            $str .= ')';
+                        }
+                        // dd($str);
+                    }
+                    if ($v['not_null'] == 1) {
+                        $str .= '->nullable()';
+                    }
+                    if ($v['default'] != null) {
+                        $str .= '->default(' . "'" . $v['default'] . "'" . ')';
+                    }
+                    $str .= '->comment(' . "'" . $v['comment'] . "'" . ');' . PHP_EOL;
+                }
+            }
+            $str .= '});' . PHP_EOL . '}' . PHP_EOL;
+            // public down()
+            $str .= 'public function down()' . PHP_EOL . '{' . PHP_EOL . 'Schema::dropIfExists(' . "'" . $table->name . "'" . ');' . PHP_EOL . '}}';
+            //生成迁移文件
+            fwrite($files_url, $str);
+            return response_json();
+        } else {
+            return response_json('文件已经存在', 6000);
+        }
+    }
+
+    /**
+     * 上传签名
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function uploadAuth(Request $request)
+    {
+        $config = array(
+            'Url' => 'https://sts.api.qcloud.com/v2/index.php',
+            'Domain' => 'sts.api.qcloud.com',
+            'Proxy' => '',
+            'SecretId' => config('filesystems.disks.cosv5.credentials.secretId'), // 固定密钥
+            'SecretKey' => config('filesystems.disks.cosv5.credentials.secretKey'), // 固定密钥
+            'Bucket' => config('filesystems.disks.cosv5.bucket'),
+            'Region' => config('filesystems.disks.cosv5.region'),
+            'AllowPrefix' => 'upload_file_mgo/*', // 这里改成允许的路径前缀，这里可以根据自己网站的用户登录态判断允许上传的目录，例子：* 或者 a/* 或者 a.jpg
+        );
+
+        $pathname = $request->get('pathname', '/');
+        $method = $request->get('method', 'get');
+        $query = $request->get('query', []);
+        $headers = $request->get('headers', []);
+
+        // 获取临时密钥，计算签名
+        $tempKeys = $this->_getTempKeys($config);
+        if ($tempKeys && isset($tempKeys['credentials'])) {
+            $data = array(
+                'Authorization' => $this->_getAuthorization($tempKeys, $method, $pathname, $query, $headers),
+                'XCosSecurityToken' => $tempKeys['credentials']['sessionToken'],
+            );
+        } else {
+            $data = array('error' => $tempKeys);
+        }
+        return response_json($data);
     }
 
 }

@@ -18,7 +18,7 @@ class CreateMgoTablesTable extends Migration
 
             $table->string('name')->comment('表名');
             $table->string('display_name')->comment('显示名称');
-            $table->string('model_class')->comment('模型类名');
+            $table->string('model_class')->nullable()->comment('模型类名');
             $table->string('comment')->nullable()->comment('备注');
             $table->string('migrate')->nullable()->comment('迁移文件');
 
